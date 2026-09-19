@@ -381,17 +381,26 @@ export function computeTeamRest(memberStats, { year, daysSoFar, currentMonth }) 
     }
   }
 
-  // Only complete months compete, so a two-day-old month can't win "quietest".
+  // Quietest considers only complete months, so a two-day-old month can't
+  // win by default. Busiest may include the current month — being busy in a
+  // partial month is still busy (and for a group whose whole year happened
+  // recently, it's the only honest answer).
   let quietestMonth;
   let busiestMonth;
-  for (let month = 0; month < currentMonth; month += 1) {
+  for (let month = 0; month <= currentMonth; month += 1) {
     const active = activeDaysPerMonth[month];
-    if (!quietestMonth || active < quietestMonth.activeDays) {
+    if (month < currentMonth && (!quietestMonth || active < quietestMonth.activeDays)) {
       quietestMonth = { month, activeDays: active };
     }
     if (!busiestMonth || active > busiestMonth.activeDays) {
       busiestMonth = { month, activeDays: active };
     }
+  }
+
+  // No contrast, no punchline: drop the busiest clause when nobody was ever
+  // busy or when it would name the same month as the quietest.
+  if (busiestMonth && (busiestMonth.activeDays === 0 || busiestMonth.month === quietestMonth?.month)) {
+    busiestMonth = undefined;
   }
 
   const monthName = (entry) =>

@@ -475,6 +475,28 @@ describe("computeTeamRest", function describeTeamRest() {
     expect(rest.busiestMonth).toBe("February");
   });
 
+  it("lets the current partial month win busiest when all activity is recent", function testRecentActivity() {
+    const rest = computeTeamRest([{ member: "A", activeDays: ["2026-09-05", "2026-09-06", "2026-09-07"] }], {
+      year: 2026,
+      daysSoFar: 260,
+      currentMonth: 8,
+    });
+
+    expect(rest.quietestMonth).toBe("January");
+    expect(rest.busiestMonth).toBe("September");
+  });
+
+  it("drops the busiest clause when there is no real contrast", function testNoContrast() {
+    const rest = computeTeamRest([{ member: "A", activeDays: [] }], {
+      year: 2026,
+      daysSoFar: 260,
+      currentMonth: 8,
+    });
+
+    expect(rest.quietestMonth).toBe("January");
+    expect(rest.busiestMonth).toBeUndefined();
+  });
+
   it("returns undefined with no members", function testTeamRestEmpty() {
     expect(computeTeamRest([], { year: 2026, daysSoFar: 90, currentMonth: 3 })).toBeUndefined();
   });
