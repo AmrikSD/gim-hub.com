@@ -95,6 +95,13 @@ const routes = [
     meta: { layout: "authed", showPanels: true },
   },
   {
+    path: "/group/wrapped",
+    component: function loadWrappedPage() {
+      return import("./components/wrapped-page/WrappedPage.vue");
+    },
+    meta: { layout: "authed" },
+  },
+  {
     path: "/group/panels",
     component: function loadPanelsPage() {
       return import("./components/panels-page/PanelsPage.vue");
