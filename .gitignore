@@ -33,3 +33,6 @@ boost.json
 .agents
 .ai
 .codex
+
+# local dev helper, seeds credentials into localStorage
+public/dev-login.html

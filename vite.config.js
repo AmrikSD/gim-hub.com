@@ -275,13 +275,31 @@ export default defineConfig({
         },
       },
     }),
-    laravel({
-      input: ["resources/views/index.js"],
-      refresh: true,
-    }),
+    // STANDALONE=1 drops the Laravel integration so `vp dev` serves the root
+    // index.html directly (SPA fallback included) with no PHP behind it.
+    ...(process.env.STANDALONE
+      ? []
+      : [
+          laravel({
+            input: ["resources/views/index.js"],
+            refresh: true,
+          }),
+        ]),
   ]),
   define: {
     __API_URL__: "'/api'",
+  },
+  // Standalone dev against the production API: index.html at the repo root
+  // replaces the Laravel shell, and /api is proxied to gim-hub.com so the
+  // browser sees a same-origin API (no CORS, no local PHP needed).
+  appType: "spa",
+  server: {
+    proxy: {
+      "/api": {
+        target: "https://gim-hub.com",
+        changeOrigin: true,
+      },
+    },
   },
   build: {
     rolldownOptions: {
